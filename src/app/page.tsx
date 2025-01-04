@@ -16,7 +16,7 @@ import {
 
 export default function HomePage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const { scenarios, loading: scenariosLoading } = useScenarios();
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function HomePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+      <div className={`grid grid-cols-1 ${user && scenarios && scenarios.length > 0 ? 'md:grid-cols-2' : 'md:max-w-md mx-auto'} gap-8 mb-16`}>
         {/* Create New Scenario Card */}
         <div className="rounded-lg border bg-green-950/50 text-card-foreground p-6 shadow-lg hover:bg-green-950/60 transition-colors">
           <div className="flex items-center gap-2 mb-2">
@@ -65,28 +65,39 @@ export default function HomePage() {
             Walk through our wizard to define your desired lifestyle,
             family situation, and location preferences.
           </p>
-          <Link href="/wizard">
-            <Button className="w-full bg-green-600 hover:bg-green-700">Start New Scenario</Button>
-          </Link>
+          {user ? (
+            <Link href="/wizard">
+              <Button className="w-full bg-green-600 hover:bg-green-700">Create New Scenario</Button>
+            </Link>
+          ) : (
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700"
+              onClick={() => signInWithGoogle()}
+            >
+              Create New Scenario
+            </Button>
+          )}
         </div>
 
-        {/* View Scenarios Card */}
-        <div className="rounded-lg border bg-card text-card-foreground p-6">
-          <div className="flex items-center gap-2 mb-2">
-            <BarChart2 className="h-6 w-6" />
-            <h2 className="text-2xl font-semibold">View Scenarios</h2>
+        {/* View Scenarios Card - Only show when user is logged in and has scenarios */}
+        {user && scenarios && scenarios.length > 0 && (
+          <div className="rounded-lg border bg-card text-card-foreground p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <BarChart2 className="h-6 w-6" />
+              <h2 className="text-2xl font-semibold">View Scenarios</h2>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Compare your saved financial scenarios
+            </p>
+            <p className="text-muted-foreground mb-6">
+              Review and compare different lifestyle scenarios to make
+              informed decisions about your financial future.
+            </p>
+            <Link href="/scenarios">
+              <Button variant="outline" className="w-full">View All Scenarios</Button>
+            </Link>
           </div>
-          <p className="text-muted-foreground mb-4">
-            Compare your saved financial scenarios
-          </p>
-          <p className="text-muted-foreground mb-6">
-            Review and compare different lifestyle scenarios to make
-            informed decisions about your financial future.
-          </p>
-          <Link href="/scenarios">
-            <Button variant="outline" className="w-full">View All Scenarios</Button>
-          </Link>
-        </div>
+        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="text-center">
