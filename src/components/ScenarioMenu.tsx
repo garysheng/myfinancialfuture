@@ -136,16 +136,7 @@ export function ScenarioMenu({ scenario, currentIncome, onDelete }: ScenarioMenu
             }}
           >
             <Printer className="mr-2 h-4 w-4" />
-            Save as Printout
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => {
-              setSaveMode('phone');
-              setShowPreview(true);
-            }}
-          >
-            <Smartphone className="mr-2 h-4 w-4" />
-            Save as Phone Background
+            Generate Printout
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-red-600" onClick={onDelete}>
@@ -160,13 +151,26 @@ export function ScenarioMenu({ scenario, currentIncome, onDelete }: ScenarioMenu
           <DialogTitle>
             {saveMode === 'phone' ? 'Save as Phone Background' : 'Save as Printout'}
           </DialogTitle>
-          <div ref={printRef} className={saveMode === 'phone' ? 'bg-black' : ''}>
-            <PrintableMotivation 
-              scenario={scenario} 
-              currentIncome={currentIncome}
-              hideDownloadButton
-              isPhoneBackground={saveMode === 'phone'}
-            />
+          <div className="h-[200px] overflow-hidden relative">
+            <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            <div className={`${saveMode === 'phone' ? 'scale-[0.08] origin-top' : ''}`}>
+              <PrintableMotivation 
+                scenario={scenario} 
+                currentIncome={currentIncome}
+                hideDownloadButton
+                isPhoneBackground={saveMode === 'phone'}
+              />
+            </div>
+          </div>
+          <div className="fixed left-[-9999px]">
+            <div ref={printRef} className={saveMode === 'phone' ? '' : ''}>
+              <PrintableMotivation 
+                scenario={scenario} 
+                currentIncome={currentIncome}
+                hideDownloadButton
+                isPhoneBackground={saveMode === 'phone'}
+              />
+            </div>
           </div>
           <DialogFooter className="flex gap-2 sm:gap-0">
             {saveMode === 'print' ? (

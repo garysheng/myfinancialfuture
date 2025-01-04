@@ -49,8 +49,7 @@ export default function AboutPage() {
             <li>Present everything in a visually appealing, easy-to-understand way</li>
           </ul>
           <p className="mt-4 text-muted-foreground">
-            I also wanted something I could put on my wall as a daily reminder, 
-            or set as my phone background to keep me focused on my financial goals. 
+            I also wanted something I could put on my wall as a daily reminder.
             Sometimes the best motivation is having your goals stare you in the face every day.
           </p>
         </div>
