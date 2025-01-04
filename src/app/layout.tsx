@@ -10,6 +10,27 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'MyFinancialFuture',
   description: 'Plan your financial future with confidence',
+  metadataBase: new URL('https://myfinancialfuture.vercel.app'),
+  openGraph: {
+    type: 'website',
+    title: 'MyFinancialFuture',
+    description: 'Discover exactly how much you need to earn for the lifestyle you want',
+    siteName: 'MyFinancialFuture',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'MyFinancialFuture - Plan your financial future with confidence'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MyFinancialFuture',
+    description: 'Discover exactly how much you need to earn for the lifestyle you want',
+    images: ['/og-image.png']
+  }
 };
 
 export default function RootLayout({
