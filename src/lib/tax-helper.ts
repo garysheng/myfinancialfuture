@@ -88,6 +88,7 @@ const STATE_TAX_FALLBACKS: Record<string, number> = {
 
 // City Tax Rates (for major cities with income tax)
 const CITY_TAX_RATES: Record<string, number> = {
+  // Major Cities with Income Tax
   'New York City': 0.03876,      // NYC highest marginal rate
   'Philadelphia': 0.0371,        // Philadelphia wage tax for residents
   'San Francisco': 0.0138,       // SF highest marginal rate
@@ -138,12 +139,54 @@ const CITY_TAX_RATES: Record<string, number> = {
   'Port Huron': 0.01,         // Port Huron, MI
   'Portland MI': 0.01,        // Portland, MI
   'Lancaster': 0.019,         // Lancaster, PA
+
+  // Major Cities with No Income Tax
+  'Los Angeles': 0,            // No city income tax
+  'Chicago': 0,               // No city income tax
+  'Houston': 0,               // No city income tax
+  'Phoenix': 0,               // No city income tax
+  'San Diego': 0,             // No city income tax
+  'Dallas': 0,                // No city income tax
+  'San Jose': 0,              // No city income tax
+  'Austin': 0,                // No city income tax
+  'Jacksonville': 0,          // No city income tax
+  'Fort Worth': 0,            // No city income tax
+  'Charlotte': 0,             // No city income tax
+  'Seattle': 0,               // No city income tax
+  'Denver': 0,                // No city income tax
+  'Boston': 0,                // No city income tax
+  'Nashville': 0,             // No city income tax
+  'Las Vegas': 0,             // No city income tax
+  'Oklahoma City': 0,         // No city income tax
+  'Miami': 0,                 // No city income tax
+  'Atlanta': 0,               // No city income tax
+  'Raleigh': 0,              // No city income tax
+  'Minneapolis': 0,           // No city income tax
+  'Tampa': 0,                 // No city income tax
+  'New Orleans': 0,           // No city income tax
+  'San Antonio': 0,           // No city income tax
+  'Sacramento': 0,            // No city income tax
+  'Orlando': 0,               // No city income tax
+  'Memphis': 0,               // No city income tax
+  'Richmond': 0,              // No city income tax
+  'Salt Lake City': 0,        // No city income tax
+  'Providence': 0,            // No city income tax
+  'Tucson': 0,               // No city income tax
+  'Honolulu': 0,             // No city income tax
+  'Albuquerque': 0,          // No city income tax
+  'Omaha': 0,                // No city income tax
+  'Boise': 0,                // No city income tax
+  'Madison': 0,              // No city income tax
+  'Charleston': 0,           // No city income tax
+  'Savannah': 0,             // No city income tax
+  'Santa Fe': 0,             // No city income tax
+  'Boulder': 0,              // No city income tax
 };
 
 // Helper function to get state tax rate with fallback
 function getStateTaxRateWithFallback(state: string): number {
-  // If we have an exact match, use it
-  if (STATE_TAX_RATES[state]) {
+  // If we have an exact match in our rates (including zero rates), use it
+  if (state in STATE_TAX_RATES) {
     return STATE_TAX_RATES[state];
   }
 
@@ -161,10 +204,10 @@ function getStateTaxRateWithFallback(state: string): number {
   return STATE_TAX_FALLBACKS.DEFAULT;
 }
 
-// Helper function to determine if a city is likely to have city tax
+// Helper function to determine if a city has city tax
 function estimateCityTaxRate(city: string, state: string): number {
-  // If we have an exact match, use it
-  if (CITY_TAX_RATES[city]) {
+  // If we have an exact match in our rates (including zero rates), use it
+  if (city in CITY_TAX_RATES) {
     return CITY_TAX_RATES[city];
   }
 
