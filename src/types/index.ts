@@ -108,4 +108,12 @@ export type UserProfile = {
 export type UserProfileBackend = Omit<UserProfile, 'createdAt' | 'updatedAt'> & {
   createdAt: FirebaseTimestamp;
   updatedAt: FirebaseTimestamp;
+};
+
+// Firebase User type
+export type FirebaseUser = {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
 }; 

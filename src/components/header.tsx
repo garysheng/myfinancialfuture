@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
+import { FirebaseUser } from '@/types';
 
 export function Header() {
   const { user, signInWithGoogle, logout, loading } = useAuth();
@@ -103,7 +104,7 @@ export function Header() {
 }
 
 function UserMenu({ user, logout, imageError, setImageError }: { 
-  user: any; 
+  user: FirebaseUser; 
   logout: () => void; 
   imageError: boolean; 
   setImageError: (error: boolean) => void; 
