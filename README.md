@@ -12,7 +12,7 @@ A sophisticated financial planning tool that helps you visualize the income need
 - Real-time tax impact calculations
 
 ## Tech Stack
-- Next.js 14 with App Router
+- Next.js 15 with App Router
 - TypeScript
 - Firebase (Auth & Firestore)
 - Tailwind CSS

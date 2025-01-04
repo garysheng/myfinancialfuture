@@ -1,0 +1,15 @@
+January 3, 2024
+- Fixed child costs calculation in SummaryStep to properly include education savings
+- Added 'children' category to OUTFLOW_CATEGORIES in constants.ts
+- Fixed tax calculation in SummaryStep to correctly compute required income (changed from expenses/(1-taxRate) to expenses*(1+taxRate))
+- Added total row to monthly expenses breakdown in SummaryStep
+- Created comprehensive README.md with project description, features, setup instructions, and documentation
+
+Previous Progress:
+- Created Next.js project with TypeScript and Tailwind CSS
+- Set up Firebase Authentication and Firestore
+- Implemented wizard interface for financial planning
+- Created lifestyle, location, and family status selection steps
+- Added outflow customization with cost of living adjustments
+- Implemented Sankey diagram for cash flow visualization
+- Added scenario saving and management functionality 
