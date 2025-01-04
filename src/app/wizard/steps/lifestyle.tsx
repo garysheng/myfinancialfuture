@@ -24,43 +24,31 @@ import {
   TrendingUp
 } from 'lucide-react';
 
-function CustomLifestyleDefiner() {
-  const { state, dispatch } = useWizard();
+function CustomLifestyleDefiner({ onExpensesChange }: { onExpensesChange: (expenses: Record<string, number>) => void }) {
+  const { state } = useWizard();
   const [expenses, setExpenses] = useState<Record<string, number>>(() => {
-    // Initialize with all categories from expenseCategories
-    const defaultExpenses = Object.fromEntries(
-      EXPENSE_CATEGORIES.map(cat => [cat.name, state.customExpenses?.[cat.name] ?? cat.default])
+    return state.customExpenses || Object.fromEntries(
+      EXPENSE_CATEGORIES.map(cat => [cat.name, cat.default])
     );
-    
-    return state.customExpenses || defaultExpenses;
   });
 
   const totalMonthly = Object.values(expenses).reduce((sum, value) => sum + value, 0);
 
-  // Update wizard context when expenses change, but only if they're different
-  useEffect(() => {
-    const currentExpensesStr = JSON.stringify(expenses);
-    const stateExpensesStr = JSON.stringify(state.customExpenses);
-    
-    if (currentExpensesStr !== stateExpensesStr) {
-      dispatch({ 
-        type: 'SET_CUSTOM_EXPENSES', 
-        payload: expenses 
-      });
-    }
-  }, [expenses, dispatch, state.customExpenses]);
-
   // Only update from state when lifestyle changes to custom
   useEffect(() => {
     if (state.lifestyle === 'custom' && state.customExpenses) {
-      const stateExpensesStr = JSON.stringify(state.customExpenses);
-      const currentExpensesStr = JSON.stringify(expenses);
-      
-      if (stateExpensesStr !== currentExpensesStr) {
-        setExpenses(state.customExpenses);
-      }
+      setExpenses(state.customExpenses);
     }
-  }, [state.lifestyle, state.customExpenses, expenses]);
+  }, [state.lifestyle, state.customExpenses]);
+
+  const handleSliderChange = (category: string, value: number[]) => {
+    const newExpenses = {
+      ...expenses,
+      [category]: value[0]
+    };
+    setExpenses(newExpenses);
+    onExpensesChange(newExpenses);
+  };
 
   return (
     <div className="space-y-6 mt-4">
@@ -87,12 +75,8 @@ function CustomLifestyleDefiner() {
               max={category.max}
               step={50}
               value={[expenses[category.name] || category.default]}
-              onValueChange={(value) => {
-                setExpenses(prev => ({
-                  ...prev,
-                  [category.name]: value[0]
-                }));
-              }}
+              onValueChange={(value) => handleSliderChange(category.name, value)}
+              className="cursor-pointer"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>${category.min.toLocaleString()}</span>
@@ -177,9 +161,36 @@ const lifestyleOptions: {
 
 export function LifestyleStep() {
   const { state, dispatch, nextStep } = useWizard();
+  const [customExpenses, setCustomExpenses] = useState<Record<string, number> | null>(state.customExpenses);
+
+  // Debug logs
+  useEffect(() => {
+    console.log('Wizard State:', state);
+    console.log('Custom Expenses State:', customExpenses);
+  }, [state, customExpenses]);
 
   const handleLifestyleChange = (value: Lifestyle) => {
+    console.log('Lifestyle Changed to:', value);
     dispatch({ type: 'SET_LIFESTYLE', payload: value });
+  };
+
+  const handleNext = () => {
+    console.log('Next clicked. Current state:', {
+      lifestyle: state.lifestyle,
+      customExpenses,
+      wizardCustomExpenses: state.customExpenses
+    });
+    
+    if (state.lifestyle === 'custom' && customExpenses) {
+      console.log('Dispatching custom expenses:', customExpenses);
+      dispatch({ type: 'SET_CUSTOM_EXPENSES', payload: customExpenses });
+    }
+    nextStep();
+  };
+
+  const handleCustomExpensesChange = (expenses: Record<string, number>) => {
+    console.log('Custom Expenses Changed:', expenses);
+    setCustomExpenses(expenses);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, currentValue: Lifestyle) => {
@@ -256,7 +267,7 @@ export function LifestyleStep() {
       </RadioGroup>
 
       <div className="flex justify-end">
-        <Button onClick={nextStep} className="flex items-center gap-2" tabIndex={-1}>
+        <Button onClick={handleNext} className="flex items-center gap-2" tabIndex={-1}>
           Continue
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -340,7 +351,7 @@ export function LifestyleStep() {
               <p className="text-sm text-muted-foreground mb-4">
                 Define your own lifestyle by customizing expense categories. This option allows you to mix and match different levels of spending across categories to match your unique preferences and priorities.
               </p>
-              <CustomLifestyleDefiner />
+              <CustomLifestyleDefiner onExpensesChange={handleCustomExpensesChange} />
               <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground italic">
                 <DollarSign className="h-4 w-4" />
                 <p>These are base costs before location adjustments</p>

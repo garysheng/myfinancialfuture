@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { Lifestyle, Location, FamilyStatus, Outflow } from '@/types';
 import { CITY_PRESETS } from '@/lib/constants';
 
@@ -46,9 +46,10 @@ const initialState: WizardState = {
 function wizardReducer(state: WizardState, action: WizardAction): WizardState {
   switch (action.type) {
     case 'SET_STEP':
+      console.log('Setting step:', action.payload, 'Current state:', state);
       return { ...state, step: action.payload };
     case 'SET_LIFESTYLE':
-      console.log('Setting lifestyle:', action.payload);
+      console.log('Setting lifestyle:', action.payload, 'Current expenses:', state.customExpenses);
       // Clear custom expenses if not custom lifestyle
       return { 
         ...state, 
@@ -64,12 +65,14 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
     case 'RESET':
       return initialState;
     case 'SET_CUSTOM_EXPENSES':
-      console.log('Setting custom expenses:', action.payload);
-      return {
+      console.log('Setting custom expenses in reducer:', action.payload);
+      const newState = {
         ...state,
         customExpenses: action.payload,
-        lifestyle: 'custom' // Ensure lifestyle is set to custom when expenses are set
+        lifestyle: 'custom' as Lifestyle
       };
+      console.log('New state after setting expenses:', newState);
+      return newState;
     default:
       return state;
   }
@@ -88,7 +91,21 @@ const WizardContext = createContext<WizardContextType | undefined>(undefined);
 export function WizardProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
 
+  // Log state changes
+  useEffect(() => {
+    console.log('Wizard State Updated:', {
+      step: state.step,
+      lifestyle: state.lifestyle,
+      customExpenses: state.customExpenses
+    });
+  }, [state]);
+
   const nextStep = () => {
+    console.log('Moving to next step. Current state:', {
+      currentStep: state.step,
+      lifestyle: state.lifestyle,
+      customExpenses: state.customExpenses
+    });
     if (state.step < 4) {
       dispatch({ type: 'SET_STEP', payload: state.step + 1 });
     }

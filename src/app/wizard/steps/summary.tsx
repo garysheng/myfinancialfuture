@@ -63,7 +63,7 @@ export function SummaryStep() {
     userId: user?.uid || '',
     userName: user?.displayName || 'Anonymous',
     isPublic: false,
-    customExpenses: undefined,
+    customExpenses: state.customExpenses || undefined,
   });
 
   const combinedAnnualIncome = Math.round(requiredAnnualIncome + (state.family.partnerIncome || 0));
@@ -120,6 +120,7 @@ export function SummaryStep() {
         userId: user.uid,
         userName: user.displayName || 'Anonymous',
         isPublic: false,
+        customExpenses: state.customExpenses || undefined,
       };
 
       const docRef = doc(db, 'users', user.uid, 'scenarios', scenario.id);
@@ -228,6 +229,7 @@ export function SummaryStep() {
               isPublic: false,
               createdAt: new Date(),
               updatedAt: new Date(),
+              customExpenses: state.customExpenses || undefined,
             }}
             monthlyIncome={requiredMonthlyIncome}
           />

@@ -1,4 +1,4 @@
-import type { Scenario, OutflowCategory } from '@/types';
+import type { Scenario, OutflowCategory, Lifestyle } from '@/types';
 import { DEFAULT_MONTHLY_OUTFLOWS, BASE_CHILD_COSTS, PARTNER_COST_MULTIPLIERS } from './constants';
 import { calculateRequiredIncome } from './tax-helper';
 
@@ -7,6 +7,14 @@ const isValidCategory = (category: string): category is OutflowCategory => {
   return Object.keys(DEFAULT_MONTHLY_OUTFLOWS.modest).includes(category);
 };
 
+function getBaseExpensesForLifestyle(lifestyle: Lifestyle): Record<OutflowCategory, number> {
+  const base = lifestyle === 'custom' ? DEFAULT_MONTHLY_OUTFLOWS.modest : DEFAULT_MONTHLY_OUTFLOWS[lifestyle];
+  return {
+    ...base,
+    children: 0
+  };
+}
+
 export function calculateRequiredMonthlyIncome(scenario: Scenario): {
   monthlyIncome: number;
   yearlyIncome: number;
@@ -14,13 +22,11 @@ export function calculateRequiredMonthlyIncome(scenario: Scenario): {
   childrenExpenses: number;
   adjustedMonthlyOutflows: Record<OutflowCategory, number>;
 } {
-  // Calculate monthly expenses based on lifestyle and location
-  const baseMonthlyOutflows = scenario.lifestyle === 'custom'
-    ? DEFAULT_MONTHLY_OUTFLOWS.modest
-    : DEFAULT_MONTHLY_OUTFLOWS[scenario.lifestyle];
-
+  // Use custom expenses if available, otherwise use lifestyle-based expenses
+  const baseExpenses = scenario.customExpenses || getBaseExpensesForLifestyle(scenario.lifestyle);
+  
   // Calculate adjusted monthly outflows with partner and location multipliers
-  const adjustedMonthlyOutflows = Object.entries(baseMonthlyOutflows).reduce<Record<OutflowCategory, number>>(
+  const adjustedMonthlyOutflows = Object.entries(baseExpenses).reduce<Record<OutflowCategory, number>>(
     (acc, [category, amount]) => {
       if (isValidCategory(category)) {
         // First apply partner multiplier if partnered
@@ -28,7 +34,7 @@ export function calculateRequiredMonthlyIncome(scenario: Scenario): {
           ? PARTNER_COST_MULTIPLIERS[category] 
           : 1;
         
-        const partnerAdjustedAmount = amount * partnerMultiplier;
+        const partnerAdjustedAmount = Number(amount) * partnerMultiplier;
         
         // Then apply location cost multiplier
         // Only apply location multiplier to living expenses, not to savings/investments
