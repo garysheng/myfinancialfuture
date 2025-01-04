@@ -4,6 +4,7 @@ import { ResponsiveSankey } from '@nivo/sankey';
 import { Card } from '@/components/ui/card';
 import { ScenarioFrontend } from '@/types';
 import { calculateTaxes } from '@/lib/tax-helper';
+import { useState, useEffect } from 'react';
 
 // Define types for nodes and links
 interface SankeyNode {
@@ -50,6 +51,15 @@ interface SankeyDiagramProps {
 }
 
 export function SankeyDiagram({ scenario }: SankeyDiagramProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Calculate tax breakdown
   const taxBreakdown = calculateTaxes({
     annualIncome: scenario.yearlyIncome,
@@ -86,14 +96,19 @@ export function SankeyDiagram({ scenario }: SankeyDiagramProps) {
     );
 
   // Create nodes for the Sankey diagram
-  const nodes: SankeyNode[] = [
-    { id: 'grossIncome', label: 'Gross Income', nodeColor: COLORS.income, layer: 0 },
-    { id: 'netIncome', label: 'Net Income', nodeColor: COLORS.netIncome, layer: 2 },
-    { id: 'federalTax', label: 'Federal Tax', nodeColor: COLORS.taxes.federal, layer: 1 },
-    { id: 'stateTax', label: 'State Tax', nodeColor: COLORS.taxes.state, layer: 1 },
-    { id: 'ficaTax', label: 'FICA Tax', nodeColor: COLORS.taxes.fica, layer: 1 },
+  const nodes: SankeyNode[] = isMobile ? [
+    { id: 'Gross Income', label: 'Gross Income', nodeColor: COLORS.income, layer: 0 },
+    { id: 'Net Income', label: 'Net Income', nodeColor: COLORS.netIncome, layer: 2 },
+    { id: 'Total Tax', label: 'Total Tax', nodeColor: COLORS.taxes.federal, layer: 1 },
+    { id: 'Non Tax Expenses', label: 'Non-Tax Expenses', nodeColor: COLORS.expenses[0], layer: 3 },
+  ] : [
+    { id: 'Gross Income', label: 'Gross Income', nodeColor: COLORS.income, layer: 0 },
+    { id: 'Net Income', label: 'Net Income', nodeColor: COLORS.netIncome, layer: 2 },
+    { id: 'Federal Tax', label: 'Federal Tax', nodeColor: COLORS.taxes.federal, layer: 1 },
+    { id: 'State Tax', label: 'State Tax', nodeColor: COLORS.taxes.state, layer: 1 },
+    { id: 'FICA Tax', label: 'FICA Tax', nodeColor: COLORS.taxes.fica, layer: 1 },
     ...Object.keys(outflowsByCategory).map((category, index) => ({
-      id: category,
+      id: category.split(/(?=[A-Z])/).join(' ').charAt(0).toUpperCase() + category.split(/(?=[A-Z])/).join(' ').slice(1),
       label: category === 'children' ? 'Child Costs' : category.charAt(0).toUpperCase() + category.slice(1),
       nodeColor: COLORS.expenses[index % COLORS.expenses.length],
       layer: 3,
@@ -101,33 +116,55 @@ export function SankeyDiagram({ scenario }: SankeyDiagramProps) {
   ];
 
   // Create links between nodes
-  const links: SankeyLink[] = [
+  const totalTax = monthlyFederalTax + monthlyStateTax + monthlyFicaTax;
+  const totalExpenses = Object.values(outflowsByCategory).reduce((sum, amount) => sum + amount, 0);
+
+  const links: SankeyLink[] = isMobile ? [
+    // Combined tax flow
+    {
+      source: 'Gross Income',
+      target: 'Total Tax',
+      value: totalTax,
+    },
+    // Net income flow
+    {
+      source: 'Gross Income',
+      target: 'Net Income',
+      value: scenario.monthlyIncome - totalTax,
+    },
+    // Combined expenses flow
+    {
+      source: 'Net Income',
+      target: 'Non Tax Expenses',
+      value: totalExpenses,
+    },
+  ] : [
     // Tax flows
     {
-      source: 'grossIncome',
-      target: 'federalTax',
+      source: 'Gross Income',
+      target: 'Federal Tax',
       value: monthlyFederalTax,
     },
     {
-      source: 'grossIncome',
-      target: 'stateTax',
+      source: 'Gross Income',
+      target: 'State Tax',
       value: monthlyStateTax,
     },
     {
-      source: 'grossIncome',
-      target: 'ficaTax',
+      source: 'Gross Income',
+      target: 'FICA Tax',
       value: monthlyFicaTax,
     },
     // Net income flow
     {
-      source: 'grossIncome',
-      target: 'netIncome',
+      source: 'Gross Income',
+      target: 'Net Income',
       value: scenario.monthlyIncome - (monthlyFederalTax + monthlyStateTax + monthlyFicaTax),
     },
     // Expense flows
     ...Object.entries(outflowsByCategory).map(([category, amount]) => ({
-      source: 'netIncome',
-      target: category,
+      source: 'Net Income',
+      target: category.split(/(?=[A-Z])/).join(' ').charAt(0).toUpperCase() + category.split(/(?=[A-Z])/).join(' ').slice(1),
       value: amount,
     })),
   ];
@@ -141,7 +178,10 @@ export function SankeyDiagram({ scenario }: SankeyDiagramProps) {
             nodes,
             links,
           }}
-          margin={{ top: 20, right: 160, bottom: 20, left: 160 }}
+          margin={isMobile
+            ? { top: 50, right: 20, bottom: 50, left: 20 }
+            : { top: 20, right: 160, bottom: 20, left: 160 }
+          }
           align="justify"
           colors={(node) => node.nodeColor}
           nodeOpacity={1}
@@ -186,7 +226,7 @@ export function SankeyDiagram({ scenario }: SankeyDiagramProps) {
             
             return 0;
           }}
-          layout="horizontal"
+          layout={isMobile ? 'vertical' : 'horizontal'}
           theme={{
             background: '#ffffff',
             text: {

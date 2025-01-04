@@ -70,7 +70,7 @@ export type Scenario = {
   userId: string;
   userName: string;
   isPublic: boolean;
-  customExpenses?: Record<string, number>;
+  customExpenses: Record<string, number>|null;
 };
 
 // User preferences and settings

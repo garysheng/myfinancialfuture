@@ -84,7 +84,7 @@ export default function Page() {
           {scenario.userName || 'Someone'} shared this financial scenario with you that shows the income needed for a specific lifestyle.
           Sign up to create your own scenarios and plan your financial future.
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button onClick={() => router.push('/wizard')}>Create Your Scenario</Button>
           <Button variant="outline" onClick={() => router.push('/about')}>Learn More About MyFinancialFuture</Button>
         </div>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
-import { User } from 'lucide-react';
+import { User, Menu } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +34,8 @@ export function Header() {
           </Link>
         </div>
 
-        <nav className="flex items-center gap-4">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-4">
           {!loading && (
             <>
               <Link href="/about">
@@ -48,39 +49,7 @@ export function Header() {
                   <Link href="/wizard">
                     <Button variant="outline">Create Scenario</Button>
                   </Link>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="relative h-8 w-8 p-0 rounded-full overflow-hidden">
-                        {!imageError && user.photoURL ? (
-                          <Image
-                            src={user.photoURL}
-                            alt="User avatar"
-                            width={32}
-                            height={32}
-                            className="h-8 w-8 rounded-full object-cover"
-                            onError={() => setImageError(true)}
-                            priority
-                          />
-                        ) : (
-                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                            <User className="h-4 w-4" />
-                          </div>
-                        )}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <Link href="/profile">
-                        <DropdownMenuItem>
-                          <User className="mr-2 h-4 w-4" />
-                          Profile
-                        </DropdownMenuItem>
-                      </Link>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => logout()}>
-                        Sign Out
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <UserMenu user={user} logout={logout} imageError={imageError} setImageError={setImageError} />
                 </div>
               ) : (
                 <Button onClick={() => signInWithGoogle()}>Sign In</Button>
@@ -88,7 +57,90 @@ export function Header() {
             </>
           )}
         </nav>
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <Link href="/about">
+                <DropdownMenuItem>About</DropdownMenuItem>
+              </Link>
+              {user ? (
+                <>
+                  <Link href="/scenarios">
+                    <DropdownMenuItem>My Scenarios</DropdownMenuItem>
+                  </Link>
+                  <Link href="/wizard">
+                    <DropdownMenuItem>Create Scenario</DropdownMenuItem>
+                  </Link>
+                  <Link href="/profile">
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => logout()}>
+                    Sign Out
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem onClick={() => signInWithGoogle()}>
+                  Sign In
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
+  );
+}
+
+function UserMenu({ user, logout, imageError, setImageError }: { 
+  user: any; 
+  logout: () => void; 
+  imageError: boolean; 
+  setImageError: (error: boolean) => void; 
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-8 w-8 p-0 rounded-full overflow-hidden">
+          {!imageError && user.photoURL ? (
+            <Image
+              src={user.photoURL}
+              alt="User avatar"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-full object-cover"
+              onError={() => setImageError(true)}
+              priority
+            />
+          ) : (
+            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+              <User className="h-4 w-4" />
+            </div>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <Link href="/profile">
+          <DropdownMenuItem>
+            <User className="mr-2 h-4 w-4" />
+            Profile
+          </DropdownMenuItem>
+        </Link>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => logout()}>
+          Sign Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 } 
