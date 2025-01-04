@@ -9,6 +9,7 @@ import { LocationStep } from '@/app/wizard/steps/location';
 import { FamilyStep } from '@/app/wizard/steps/family';
 import { SummaryStep } from '@/app/wizard/steps/summary';
 import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
 
 export default function WizardPage() {
   const { user, loading } = useAuth();
@@ -82,18 +83,27 @@ function StepNavigation({ steps }: { steps: { value: string; label: string }[] }
                 parseInt(step.value) > state.step && "text-muted-foreground"
               )}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col items-center gap-1">
                 <div 
                   className={cn(
                     "w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium border-2",
-                    parseInt(step.value) === state.step && "border-accent-success bg-accent-success text-white",
-                    parseInt(step.value) < state.step && "border-accent-info bg-accent-info text-white",
+                    parseInt(step.value) === state.step && "border-primary bg-primary text-primary-foreground",
+                    parseInt(step.value) < state.step && "border-green-500 bg-green-500 text-white",
                     parseInt(step.value) > state.step && "border-muted bg-muted text-muted-foreground"
                   )}
                 >
-                  {step.value}
+                  {parseInt(step.value) < state.step ? (
+                    <Check className="h-3.5 w-3.5" />
+                  ) : (
+                    step.value
+                  )}
                 </div>
-                {step.label}
+                <span className={cn(
+                  "text-sm",
+                  parseInt(step.value) === state.step && "text-foreground",
+                  parseInt(step.value) < state.step && "text-green-500",
+                  parseInt(step.value) > state.step && "text-muted-foreground"
+                )}>{step.label}</span>
               </div>
             </TabsTrigger>
           ))}

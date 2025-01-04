@@ -134,10 +134,9 @@ export default function ScenariosPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => setDeletingId(scenario.id)}
-                        className="text-destructive hover:text-destructive"
+                        className="text-red-500 hover:text-red-500 hover:bg-red-500/10"
                       >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
