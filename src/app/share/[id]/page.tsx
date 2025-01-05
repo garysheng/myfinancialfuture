@@ -78,7 +78,7 @@ export default function Page() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8 space-y-4">
+      <div className="mb-8 space-y-4 pb-8 border-b">
         <h1 className="text-2xl font-bold italic" tabIndex={-1}>Welcome to MyFinancialFuture</h1>
         <p className="text-muted-foreground" tabIndex={-1}>
           {scenario.userName || 'Someone'} shared this financial scenario with you that shows the income needed for a specific lifestyle.

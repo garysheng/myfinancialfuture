@@ -2,15 +2,26 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // User profiles
     match /users/{userId} {
-      // Allow users to read and write their own data
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId);
+      allow delete: if false; // Never allow deletion of user profiles
+
+      // User's scenarios
       match /scenarios/{scenarioId} {
-        // Allow users to read and write their own scenarios
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-        // Allow anyone to read public scenarios
-        allow read: if resource.data.isPublic == true;
+        allow read: if isOwner(userId) || resource.data.isPublic == true;
+        allow create: if isOwner(userId);
+        allow update, delete: if isOwner(userId);
       }
     }
   }

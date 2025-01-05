@@ -358,13 +358,6 @@ export function ScenarioContent({ id, isSharePage = false, creatorProfile = null
           scenario={scenario} 
           monthlyIncome={incomeDetails?.monthlyIncome || scenario.monthlyIncome}
         />
-
-        <div className="text-sm text-muted-foreground text-center">
-          <p>
-            Note: All income figures are before taxes. Monthly expenses are adjusted
-            based on your location&apos;s cost of living multiplier.
-          </p>
-        </div>
       </div>
     </div>
   );
